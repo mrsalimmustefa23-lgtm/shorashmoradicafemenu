@@ -346,10 +346,20 @@
     }
     const menuItems = [
       { name: "Espresso", category: "Coffee", price: "IQD 3,250", description: "A rich, concentrated shot with a velvety crema.", image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?auto=format&fit=crop&w=900&q=80", badge: "Classic" },
-      { name: "Americano", category: "Coffee", price: "IQD 4,000", description: "Espresso lengthened with hot water for a clean finish.", image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Americano", category: "Coffee", price: "IQD 4,000", description: "Espresso lengthened with hot water for a clean finish.", image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=80" },
+      { name: "Spanish Latte", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso with steamed milk and a smooth sweet finish.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
+      { name: "Double Espresso", category: "Hot Coffee", price: "IQD 4,500", description: "Two rich espresso shots with a velvety crema.", image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Caramel", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso and steamed milk with a warm caramel flavor.", image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Lotus", category: "Hot Coffee", price: "IQD 5,500", description: "A creamy hot coffee with a lightly spiced Lotus biscuit flavor.", image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Milk", category: "Hot Coffee", price: "IQD 3,500", description: "Warm steamed milk, soft and comforting.", image: "https://images.unsplash.com/photo-1557006021-b85faa2bc5e2?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Chocolate", category: "Hot Coffee", price: "IQD 5,000", description: "Rich chocolate blended with warm milk and a creamy finish.", image: "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Vanilla", category: "Hot Coffee", price: "IQD 5,500", description: "Smooth hot coffee with a gentle vanilla aroma.", image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Coconut", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso and warm milk with a delicate coconut note.", image: "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Hazelnut", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso and steamed milk finished with roasted hazelnut flavor.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot White Mocha", category: "Hot Coffee", price: "IQD 6,000", description: "Espresso with creamy white chocolate and steamed milk.", image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=900&q=80" },
       { name: "Cappuccino", category: "Coffee", price: "IQD 4,500", description: "Espresso with steamed milk and a cloud of creamy foam.", image: "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=900&q=80", badge: "House favorite" },
-      { name: "Latte", category: "Coffee", price: "IQD 5,000", description: "Smooth espresso and silky steamed milk, softly balanced.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
-      { name: "Mocha", category: "Coffee", price: "IQD 5,500", description: "Espresso, dark chocolate and steamed milk finished with foam.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Latte", category: "Coffee", price: "IQD 5,000", description: "Smooth espresso and silky steamed milk, softly balanced.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Mocha", category: "Coffee", price: "IQD 5,500", description: "Espresso, dark chocolate and steamed milk finished with foam.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
       { name: "Macchiato", category: "Coffee", price: "IQD 4,250", description: "Espresso marked with a small spoonful of silky milk foam.", image: "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=80" },
       { name: "Turkish Coffee", category: "Coffee", price: "IQD 4,500", description: "Traditionally brewed, intensely aromatic and unfiltered.", image: "https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=900&q=80", badge: "Traditional" },
       { name: "Iced Coffee", category: "Cold Drinks", price: "IQD 5,000", description: "Chilled coffee over ice with a bright, refreshing finish.", image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=80" },
@@ -387,6 +397,12 @@
 
     const builtInArabicItems = {
       Espresso: ["إسبريسو", "قهوة مركزة وغنية بطبقة كريمية ناعمة."], Americano: ["أمريكانو", "إسبريسو ممزوج بالماء الساخن لمذاق نقي."], Cappuccino: ["كابتشينو", "إسبريسو مع حليب مبخر ورغوة كريمية."], Latte: ["لاتيه", "إسبريسو ناعم مع حليب مبخر silky ومتوازن."], Mocha: ["موكا", "إسبريسو وشوكولاتة داكنة وحليب مبخر مع رغوة."], Macchiato: ["ماكياتو", "إسبريسو مع لمسة من رغوة الحليب الناعمة."], "Turkish Coffee": ["قهوة تركية", "قهوة محضرة بالطريقة التقليدية، عطرية ومركزة."], "Iced Coffee": ["قهوة مثلجة", "قهوة باردة فوق الثلج بمذاق منعش."], "Iced Latte": ["لاتيه مثلج", "حليب بارد وإسبريسو فوق الثلج."], "Iced Mocha": ["موكا مثلجة", "شوكولاتة وإسبريسو وحليب بارد فوق الثلج."], "Fresh Orange Juice": ["عصير برتقال طازج", "برتقال معصور طازجاً، مشرق وحلو طبيعياً."], Lemonade: ["ليمونادة", "ليمونادة منزلية بنكهة حمضية منعشة."], Mojito: ["موهيتو", "نعناع طازج ولايم وصودا بنهاية باردة ومنعشة."], "Blue Lagoon": ["بلو لاغون", "كوكتيل حمضي ملون بنكهة استوائية مشرقة."], "Strawberry Cocktail": ["كوكتيل فراولة", "فراولة ناضجة وحمضيات ولمسة فوارة لطيفة."], "Fruit Cocktail": ["كوكتيل فواكه", "نكهات فواكه موسمية ممزوجة بطريقة ملونة."], Cheesecake: ["تشيزكيك", "تشيزكيك كريمي مخبوز مع قاعدة بسكويت بالزبدة."], "Chocolate Cake": ["كيكة شوكولاتة", "كيكة شوكولاتة طرية مع تغطية غاناش لامعة."], Tiramisu: ["تيراميسو", "طبقات مغمسة بالقهوة مع كريمة ماسكاربوني وكاكاو."], Brownie: ["براوني", "براوني شوكولاتة داكنة بقلب طري وغني."], "Ice Cream": ["آيس كريم", "كرَتان من اختيارك تقدمان باردتين وببساطة."], Pizza: ["بيتزا", "عجينة رقيقة ومقرمشة مع طماطم وموزاريلا وريحان."], Burger: ["برغر", "قطعة لحم مشوية مع صلصة خاصة وخضار طازجة."], Sandwich: ["ساندويتش", "خبز محمص مع حشوات طازجة وخضار."], "French Fries": ["بطاطا مقلية", "بطاطا ذهبية ومقرمشة مع ملح البحر."], "Chicken Sandwich": ["ساندويتش دجاج", "دجاج مشوي وأعشاب وخس مقرمش في خبز محمص."], "Black Tea": ["شاي أسود", "شاي كلاسيكي غني يقدم ساخناً وعطراً."], "Green Tea": ["شاي أخضر", "شاي أخضر خفيف بنهاية نظيفة ومنعشة."], "Lemon Tea": ["شاي بالليمون", "حمضيات مشرقة مع شاي دافئ ومنعش."], "Mint Tea": ["شاي بالنعناع", "شاي مهدئ مع أوراق نعناع طازجة وعطرة."], Croissant: ["كرواسون", "طبقات زبدية هشة مخبوزة طازجة للصباح."], "Egg Breakfast": ["فطور بالبيض", "بيض وخبز وجوانب موسمية لبداية يوم سهلة."], "Cheese Sandwich": ["ساندويتش جبن", "جبن مذاب وخبز محمص بقشرة ذهبية."], Pancakes: ["بان كيك", "طبقات هشة مع شراب القيقب وفواكه موسمية."], "Vanilla Ice Cream": ["آيس كريم فانيلا", "آيس كريم ناعم بنكهة الفانيلا الطبيعية."], "Chocolate Ice Cream": ["آيس كريم شوكولاتة", "آيس كريم كاكاو غني وناعم."], "Strawberry Ice Cream": ["آيس كريم فراولة", "آيس كريم كريمي بنكهة الفراولة الحقيقية."], "Mixed Ice Cream": ["آيس كريم مشكل", "ثلاث كرات من نكهاتنا المفضلة في طبق واحد."]
+    };
+    const builtInArabicHotCoffeeItems = {
+      "Hot Americano": ["أمريكانو ساخن", "إسبريسو ممزوج بالماء الساخن لمذاق نقي."], "Spanish Latte": ["لاتيه إسباني", "إسبريسو مع حليب مبخر ولمسة حلوة ناعمة."], "Double Espresso": ["إسبريسو مزدوج", "جرعتان غنيتان من الإسبريسو بطبقة كريمية ناعمة."], "Hot Latte": ["لاتيه ساخن", "إسبريسو ناعم مع حليب مبخر حريري."], "Hot Caramel": ["كراميل ساخن", "إسبريسو وحليب مبخر بنكهة الكراميل الدافئة."], "Hot Lotus": ["لوتس ساخن", "قهوة ساخنة كريمية بنكهة بسكويت اللوتس."], "Hot Milk": ["حليب ساخن", "حليب مبخر دافئ وناعم ومريح."], "Hot Chocolate": ["شوكولاتة ساخنة", "شوكولاتة غنية ممزوجة بالحليب الدافئ."], "Hot Vanilla": ["فانيلا ساخنة", "قهوة ساخنة ناعمة برائحة الفانيلا اللطيفة."], "Hot Coconut": ["جوز الهند الساخن", "إسبريسو وحليب دافئ مع لمسة جوز الهند."], "Hot Hazelnut": ["بندق ساخن", "إسبريسو وحليب مبخر بنكهة البندق المحمص."], "Hot Mocha": ["موكا ساخنة", "إسبريسو وشوكولاتة داكنة وحليب مبخر مع رغوة."], "Hot White Mocha": ["موكا بيضاء ساخنة", "إسبريسو مع شوكولاتة بيضاء كريمية وحليب مبخر."]
+    };
+    const builtInBadiniItems = {
+      Espresso: ["ئێسپریسۆ", "قەھوەیەکا زۆر توند و بۆنخۆش ب کۆڵکەکا نەرم."], "Hot Americano": ["ئەمەریکانۆ یا گەرم", "ئێسپریسۆ ب ئاڤا گەرم هاتیە تێکدان بۆ تامەکێ پاک."], "Spanish Latte": ["لاتێیا ئیسپانی", "ئێسپریسۆ ب شیرێ هاتیە ڤەدان و تامەکێ شیرین و نەرم."], "Double Espresso": ["ئێسپریسۆیا دوو", "دوو قاپێن ئێسپریسۆیێن توند ب کۆڵکەکا نەرم."], "Hot Latte": ["لاتێیا گەرم", "ئێسپریسۆیا نەرم ب شیرێ هاتیە ڤەدان."], "Hot Caramel": ["کارامێلا گەرم", "ئێسپریسۆ و شیر ب تاما کارامێلێ یا گەرم."], "Hot Lotus": ["لۆتوسا گەرم", "قەھوەیەکا گەرم و کریمی ب تاما بسکویتێ لۆتوسێ."], "Hot Milk": ["شیرێ گەرم", "شیرێ گەرم و نەرم بۆ ئارامی."], "Hot Chocolate": ["شکولاتەیا گەرم", "شکولاتەکا دەولەمەند ب شیرێ گەرم هاتیە تێکدان."], "Hot Vanilla": ["ڤانیلا یا گەرم", "قەھوەیەکا نەرم ب بۆنا ڤانیلا یا خۆش."], "Hot Coconut": ["نارگیلا گەرم", "ئێسپریسۆ و شیرێ گەرم ب تاما نارگیلێ."], "Hot Hazelnut": ["فندقا گەرم", "ئێسپریسۆ و شیر ب تاما فندقێ هاتیە تەواوکرن."], "Hot Mocha": ["مۆکا یا گەرم", "ئێسپریسۆ و شکولاتە و شیرێ گەرم ب کۆڵکە."], "Hot White Mocha": ["مۆکا یا گەرم یا سپی", "ئێسپریسۆ ب شکولاتەیا سپی و شیرێ گەرم."]
     };
     const categoryDetails = {
       "Hot Coffee": ["fa-mug-hot", "Warm, familiar and carefully brewed."],
@@ -430,6 +446,16 @@
         if (!item.nameAr) item.nameAr = arabic[0];
         if (!item.descriptionAr) item.descriptionAr = arabic[1];
       }
+      const arabicHotCoffee = builtInArabicHotCoffeeItems[item.name];
+      if (arabicHotCoffee) {
+        if (!item.nameAr) item.nameAr = arabicHotCoffee[0];
+        if (!item.descriptionAr) item.descriptionAr = arabicHotCoffee[1];
+      }
+      const badini = builtInBadiniItems[item.name];
+      if (badini) {
+        if (!item.nameKu) item.nameKu = badini[0];
+        if (!item.descriptionKu) item.descriptionKu = badini[1];
+      }
     });
     const savedCategories = localStorage.getItem("shorash-menu-categories");
     if (savedCategories) {
@@ -447,6 +473,16 @@
       if (arabic) {
         if (!item.nameAr) item.nameAr = arabic[0];
         if (!item.descriptionAr) item.descriptionAr = arabic[1];
+      }
+      const arabicHotCoffee = builtInArabicHotCoffeeItems[item.name];
+      if (arabicHotCoffee) {
+        if (!item.nameAr) item.nameAr = arabicHotCoffee[0];
+        if (!item.descriptionAr) item.descriptionAr = arabicHotCoffee[1];
+      }
+      const badini = builtInBadiniItems[item.name];
+      if (badini) {
+        if (!item.nameKu) item.nameKu = badini[0];
+        if (!item.descriptionKu) item.descriptionKu = badini[1];
       }
     });
     menuItems.forEach(item => { if (!categoryDetails[item.category]) categoryDetails[item.category] = ["fa-tag", "Fresh from the cafe."]; });
