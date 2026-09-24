@@ -1058,8 +1058,6 @@
     startIntroAudio();
     introOpen.addEventListener("click", () => {
       introOpen.disabled = true;
-      introAudio.pause();
-      introAudio.currentTime = 0;
       document.body.classList.add("menu-opening");
       const loader = document.getElementById("loader");
       loader.classList.add("is-opening");
