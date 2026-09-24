@@ -270,7 +270,7 @@
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="loader" id="loader" aria-label="Loading menu">
-    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"></div>
+    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"><audio id="introAudio" src="Intro shorash.mp3" preload="auto"></audio></div>
   </div>
 
   <header class="site-header">
@@ -1019,7 +1019,18 @@
     window.addEventListener("scroll", updateScrollEffects, { passive: true });
     updateScrollEffects();
     backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-    window.addEventListener("load", () => setTimeout(() => document.getElementById("loader").classList.add("done"), 350));
+    const introAudio = document.getElementById("introAudio");
+    let introAudioStarted = false;
+    function startIntroAudio() {
+      if (introAudioStarted) return;
+      introAudioStarted = true;
+      introAudio.play().catch(() => { introAudioStarted = false; });
+    }
+    window.addEventListener("load", () => {
+      startIntroAudio();
+      setTimeout(() => document.getElementById("loader").classList.add("done"), 350);
+    });
+    ["pointerdown", "keydown", "touchstart"].forEach(eventName => window.addEventListener(eventName, startIntroAudio, { once: true, passive: true }));
   </script>
 </body>
 </html>
