@@ -270,7 +270,7 @@
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="loader" id="loader" aria-label="Loading menu">
-    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"><audio id="introAudio" src="Intro shorash.mp3" preload="auto"></audio></div>
+    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"><audio id="introAudio" src="Intro shorash.mp3" preload="auto" autoplay playsinline></audio></div>
   </div>
 
   <header class="site-header">
@@ -1026,10 +1026,8 @@
       introAudioStarted = true;
       introAudio.play().catch(() => { introAudioStarted = false; });
     }
-    window.addEventListener("load", () => {
-      startIntroAudio();
-      setTimeout(() => document.getElementById("loader").classList.add("done"), 350);
-    });
+    startIntroAudio();
+    window.addEventListener("load", () => requestAnimationFrame(() => document.getElementById("loader").classList.add("done")));
     ["pointerdown", "keydown", "touchstart"].forEach(eventName => window.addEventListener(eventName, startIntroAudio, { once: true, passive: true }));
   </script>
 </body>
