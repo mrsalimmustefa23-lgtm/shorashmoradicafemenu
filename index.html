@@ -244,18 +244,36 @@
     .admin-access:hover, .admin-access:focus-visible { color: var(--gold); outline: none; }
     @media (max-width: 767px) { .admin-view { padding: 1rem 0 3rem; } .admin-grid { grid-template-columns: 1fr; } .admin-top { align-items: start; } .admin-title { font-size: 2.1rem; } .admin-summary { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .45rem; } .admin-stat { padding: .75rem .6rem; } .admin-stat strong { font-size: 1.15rem; } .admin-stat span { font-size: .55rem; letter-spacing: .03em; } .admin-item { align-items: start; } .admin-price-row { flex-wrap: wrap; } .admin-price-input { width: 105px; } .admin-list-toolbar { align-items: stretch; flex-direction: column; } .admin-list-search { max-width: none; width: 100%; } .admin-login { margin-top: 4vh; padding: 1.35rem; } .admin-login-cowboy { width: 72px; height: 78px; } .admin-login-arabic { width: 125px; height: 70px; } }
     .loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; color: #F5F5F5; background: #343840; transition: opacity .5s ease, visibility .5s ease; }
-    .loader.done { opacity: 0; visibility: hidden; }
+    .loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
     .loader-inner { text-align: center; animation: loaderEnter .9s both cubic-bezier(.2,.8,.2,1); }
+    .loader.is-opening .loader-inner { animation: introExit .55s both cubic-bezier(.2,.8,.2,1); }
     .loader-logo { width: clamp(150px, 42vw, 235px); height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 16px 22px rgba(0, 0, 0, .28)); animation: logoFloat 2.4s ease-in-out infinite; }
     .loader-arabic-logo { width: clamp(190px, 52vw, 300px); height: auto; display: block; margin: .25rem auto 0; filter: brightness(0) saturate(100%) invert(76%) sepia(31%) saturate(750%) hue-rotate(358deg) brightness(95%) contrast(88%); }
     .loader-name { margin: 1rem 0 0; color: var(--gold); font-family: "Cairo", sans-serif; font-size: clamp(.9rem, 3vw, 1.15rem); font-weight: 900; letter-spacing: .04em; }
     .loader p { margin: .25rem 0 0; color: rgba(248, 239, 227, .7); font-size: .62rem; letter-spacing: .22em; text-transform: uppercase; }
+    .intro-open { margin-top: 1.4rem; padding: .75rem 1.3rem; border: 1px solid var(--gold); border-radius: 999px; color: #102f2b; background: var(--gold); font-weight: 800; cursor: pointer; transition: transform .25s ease, box-shadow .25s ease; }
+    .intro-open:hover, .intro-open:focus-visible { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(229, 185, 104, .25); outline: none; }
+    .intro-open:active { transform: translateY(0) scale(.96); }
+    .loader.is-opening .intro-open { opacity: 0; transform: translateY(10px) scale(.92); }
+    .intro-languages { display: flex; justify-content: center; gap: .4rem; margin-top: 1.15rem; animation: introLanguagesIn .8s both .35s; }
+    .intro-language { padding: .42rem .7rem; border: 1px solid rgba(229, 185, 104, .42); border-radius: 999px; color: var(--muted); background: rgba(7, 31, 28, .28); cursor: pointer; font-size: .68rem; font-weight: 700; transition: color .25s ease, background .25s ease, border-color .25s ease, transform .25s ease; }
+    .intro-language:hover, .intro-language:focus-visible, .intro-language.active { color: #102f2b; background: var(--gold); border-color: var(--gold); transform: translateY(-2px); outline: none; }
+    .loader.is-opening .intro-languages { opacity: 0; transform: translateY(10px); }
+    body.menu-opening .site-header, body.menu-opening .search-panel, body.menu-opening .category-bar, body.menu-opening main, body.menu-opening .site-footer { animation: menuReveal .7s both cubic-bezier(.2,.8,.2,1); }
+    body.menu-opening .site-header { animation-delay: .08s; }
+    body.menu-opening .search-panel { animation-delay: .14s; }
+    body.menu-opening .category-bar { animation-delay: .2s; }
+    body.menu-opening main { animation-delay: .26s; }
+    body.menu-opening .site-footer { animation-delay: .32s; }
     .scroll-progress { position: fixed; top: 0; left: 0; z-index: 120; width: 0; height: 3px; background: var(--gold); box-shadow: 0 0 14px rgba(229, 185, 104, .8); transition: width .08s linear; }
     @keyframes rise { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     @keyframes pageIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
     @keyframes pulse { 50% { transform: scale(1.12); opacity: .7; } }
     @keyframes coffeeFloat { 0%, 100% { transform: translateY(0) rotate(-4deg); } 50% { transform: translateY(-3px) rotate(4deg); } }
     @keyframes loaderEnter { from { opacity: 0; transform: translateY(18px) scale(.92); } to { opacity: 1; transform: none; } }
+    @keyframes introExit { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateY(-22px) scale(1.06); } }
+    @keyframes introLanguagesIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+    @keyframes menuReveal { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
     @keyframes logoFloat { 0%, 100% { transform: translateY(0) rotate(-1deg); } 50% { transform: translateY(-8px) rotate(1deg); } }
     @keyframes lineReveal { from { opacity: 0; transform: scaleX(0); } to { opacity: 1; transform: scaleX(1); } }
     @keyframes textureDrift { from { background-position: 0 0; } to { background-position: 48px 48px; } }
@@ -270,7 +288,7 @@
 <body>
   <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
   <div class="loader" id="loader" aria-label="Loading menu">
-    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"><audio id="introAudio" src="Intro shorash.mp3" preload="auto" autoplay playsinline></audio></div>
+    <div class="loader-inner"><img class="loader-logo" src="salim_shoras-removebg-preview.png" alt="Shorash Moradi Cafe logo"><img class="loader-arabic-logo" src="Shorash 1.png" alt="Shorash Moradi Arabic logo"><div class="intro-languages" aria-label="Choose language"><button class="intro-language" type="button" data-intro-language="en">English</button><button class="intro-language" type="button" data-intro-language="ar">العربية</button><button class="intro-language" type="button" data-intro-language="ku">Badînî</button></div><button class="intro-open" id="introOpen" type="button">Open Menu</button><audio id="introAudio" src="Intro shorash.mp3" preload="auto" autoplay playsinline></audio></div>
   </div>
 
   <header class="site-header">
@@ -932,6 +950,16 @@
     renderMenu();
     modal = new bootstrap.Modal(document.getElementById("itemModal"));
     setLanguage(currentLanguage);
+    const introLanguageButtons = document.querySelectorAll("[data-intro-language]");
+    function updateIntroLanguageState() {
+      introLanguageButtons.forEach(button => button.classList.toggle("active", button.dataset.introLanguage === currentLanguage));
+      document.getElementById("introOpen").textContent = currentLanguage === "ar" ? "فتح القائمة" : currentLanguage === "ku" ? "مینیو ڤەکە" : "Open Menu";
+    }
+    introLanguageButtons.forEach(button => button.addEventListener("click", () => {
+      setLanguage(button.dataset.introLanguage);
+      updateIntroLanguageState();
+    }));
+    updateIntroLanguageState();
 
     if (location.hash === "#admin") showAdmin();
     document.addEventListener("click", event => { if (event.target.closest("a[href=\"#admin\"]")) { event.preventDefault(); showAdmin(); } });
@@ -1020,6 +1048,7 @@
     updateScrollEffects();
     backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
     const introAudio = document.getElementById("introAudio");
+    const introOpen = document.getElementById("introOpen");
     let introAudioStarted = false;
     function startIntroAudio() {
       if (introAudioStarted) return;
@@ -1027,7 +1056,15 @@
       introAudio.play().catch(() => { introAudioStarted = false; });
     }
     startIntroAudio();
-    window.addEventListener("load", () => requestAnimationFrame(() => document.getElementById("loader").classList.add("done")));
+    introOpen.addEventListener("click", () => {
+      introOpen.disabled = true;
+      introAudio.pause();
+      introAudio.currentTime = 0;
+      document.body.classList.add("menu-opening");
+      const loader = document.getElementById("loader");
+      loader.classList.add("is-opening");
+      window.setTimeout(() => loader.classList.add("done"), 180);
+    });
     ["pointerdown", "keydown", "touchstart"].forEach(eventName => window.addEventListener(eventName, startIntroAudio, { once: true, passive: true }));
   </script>
 </body>
