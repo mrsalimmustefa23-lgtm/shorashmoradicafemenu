@@ -345,8 +345,8 @@
       console.warn("Firebase is unavailable; local menu storage remains active.", error);
     }
     const menuItems = [
-      { name: "Espresso", category: "Coffee", price: "IQD 3,250", description: "A rich, concentrated shot with a velvety crema.", image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?auto=format&fit=crop&w=900&q=80", badge: "Classic" },
-      { name: "Hot Americano", category: "Coffee", price: "IQD 4,000", description: "Espresso lengthened with hot water for a clean finish.", image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=80" },
+      { name: "Espresso", category: "Hot Coffee", price: "IQD 3,250", description: "A rich, concentrated shot with a velvety crema.", image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?auto=format&fit=crop&w=900&q=80", badge: "Classic" },
+      { name: "Hot Americano", category: "Hot Coffee", price: "IQD 4,000", description: "Espresso lengthened with hot water for a clean finish.", image: "https://images.unsplash.com/photo-1551030173-122aabc4489c?auto=format&fit=crop&w=900&q=80" },
       { name: "Spanish Latte", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso with steamed milk and a smooth sweet finish.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
       { name: "Double Espresso", category: "Hot Coffee", price: "IQD 4,500", description: "Two rich espresso shots with a velvety crema.", image: "https://images.unsplash.com/photo-1510707577719-ae7c14805e3a?auto=format&fit=crop&w=900&q=80" },
       { name: "Hot Caramel", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso and steamed milk with a warm caramel flavor.", image: "https://images.unsplash.com/photo-1541167760496-1628856ab772?auto=format&fit=crop&w=900&q=80" },
@@ -358,8 +358,8 @@
       { name: "Hot Hazelnut", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso and steamed milk finished with roasted hazelnut flavor.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
       { name: "Hot White Mocha", category: "Hot Coffee", price: "IQD 6,000", description: "Espresso with creamy white chocolate and steamed milk.", image: "https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=900&q=80" },
       { name: "Cappuccino", category: "Coffee", price: "IQD 4,500", description: "Espresso with steamed milk and a cloud of creamy foam.", image: "https://images.unsplash.com/photo-1534778101976-62847782c213?auto=format&fit=crop&w=900&q=80", badge: "House favorite" },
-      { name: "Hot Latte", category: "Coffee", price: "IQD 5,000", description: "Smooth espresso and silky steamed milk, softly balanced.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
-      { name: "Hot Mocha", category: "Coffee", price: "IQD 5,500", description: "Espresso, dark chocolate and steamed milk finished with foam.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Latte", category: "Hot Coffee", price: "IQD 5,000", description: "Smooth espresso and silky steamed milk, softly balanced.", image: "https://images.unsplash.com/photo-1570968915860-54d5c301fa9f?auto=format&fit=crop&w=900&q=80" },
+      { name: "Hot Mocha", category: "Hot Coffee", price: "IQD 5,500", description: "Espresso, dark chocolate and steamed milk finished with foam.", image: "https://images.unsplash.com/photo-1578314675249-a6910f80cc4e?auto=format&fit=crop&w=900&q=80" },
       { name: "Macchiato", category: "Coffee", price: "IQD 4,250", description: "Espresso marked with a small spoonful of silky milk foam.", image: "https://images.unsplash.com/photo-1498804103079-a6351b050096?auto=format&fit=crop&w=900&q=80" },
       { name: "Turkish Coffee", category: "Coffee", price: "IQD 4,500", description: "Traditionally brewed, intensely aromatic and unfiltered.", image: "https://images.unsplash.com/photo-1594631252845-29fc4cc8cde9?auto=format&fit=crop&w=900&q=80", badge: "Traditional" },
       { name: "Iced Coffee", category: "Cold Drinks", price: "IQD 5,000", description: "Chilled coffee over ice with a bright, refreshing finish.", image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=80" },
@@ -457,6 +457,7 @@
         if (!item.descriptionKu) item.descriptionKu = badini[1];
       }
     });
+    const builtInHotCoffeeCatalog = menuItems.filter(item => item.category === "Hot Coffee").map(item => ({ ...item }));
     const savedCategories = localStorage.getItem("shorash-menu-categories");
     if (savedCategories) {
       try { Object.assign(categoryDetails, JSON.parse(savedCategories)); } catch (error) { localStorage.removeItem("shorash-menu-categories"); }
@@ -488,6 +489,7 @@
     menuItems.forEach(item => { if (!categoryDetails[item.category]) categoryDetails[item.category] = ["fa-tag", "Fresh from the cafe."]; });
     categories = [...new Set([...Object.keys(categoryDetails), ...menuItems.map(item => item.category)])];
     allCategories = ["All", ...categories];
+    const requestedHotCoffeeNames = new Set(["Spanish Latte", "Hot Americano", "Espresso", "Double Espresso", "Hot Latte", "Hot Caramel", "Hot Lotus", "Hot Milk", "Hot Chocolate", "Hot Vanilla", "Hot Coconut", "Hot Hazelnut", "Hot Mocha", "Hot White Mocha"]);
     const menuContent = document.getElementById("menuContent");
     const categoryNav = document.getElementById("categoryNav");
     const mobileMenuLinks = document.getElementById("mobileMenuLinks");
@@ -780,6 +782,38 @@
       }
       const listPanel = adminList.closest(".admin-panel");
       const logoutButton = document.getElementById("adminLogout");
+      if (listPanel && !document.getElementById("addHotCoffeeMenu")) {
+        const addHotCoffeeButton = document.createElement("button");
+        addHotCoffeeButton.className = "admin-secondary mb-3";
+        addHotCoffeeButton.id = "addHotCoffeeMenu";
+        addHotCoffeeButton.type = "button";
+        addHotCoffeeButton.innerHTML = '<i class="fa-solid fa-mug-hot" aria-hidden="true"></i> Add Hot Coffee menu';
+        listPanel.insertBefore(addHotCoffeeButton, listPanel.querySelector(".admin-list-toolbar") || adminList);
+        addHotCoffeeButton.addEventListener("click", async () => {
+          const existingNames = new Set(menuItems.map(item => item.name));
+          const missingItems = builtInHotCoffeeCatalog.filter(item => requestedHotCoffeeNames.has(item.name) && !existingNames.has(item.name)).map(item => ({ ...item }));
+          if (!missingItems.length) {
+            adminCategoryError.textContent = "All Hot Coffee items are already in the menu.";
+            return;
+          }
+          missingItems.forEach(item => {
+            const arabic = builtInArabicHotCoffeeItems[item.name];
+            const badini = builtInBadiniItems[item.name];
+            if (arabic) { item.nameAr = item.nameAr || arabic[0]; item.descriptionAr = item.descriptionAr || arabic[1]; }
+            if (badini) { item.nameKu = item.nameKu || badini[0]; item.descriptionKu = item.descriptionKu || badini[1]; }
+          });
+          menuItems.push(...missingItems);
+          syncCategories();
+          renderMenu(searchInput.value);
+          refreshAdminList();
+          try {
+            await persistMenu();
+            adminCategoryError.textContent = `${missingItems.length} Hot Coffee items added and synced online.`;
+          } catch (error) {
+            adminCategoryError.textContent = error.message;
+          }
+        });
+      }
       if (logoutButton && !document.getElementById("clearAllItems")) {
         const clearButton = document.createElement("button");
         clearButton.className = "admin-secondary admin-danger";
