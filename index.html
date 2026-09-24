@@ -334,6 +334,7 @@
     let firebaseDatabase = null;
     let firebaseStorage = null;
     let firebaseAuth = null;
+    let pendingMenuWrite = null;
     try {
       const firebaseApp = firebase.initializeApp(firebaseConfig);
       firebaseAuth = firebase.auth(firebaseApp);
@@ -704,12 +705,25 @@
       renderMenu(searchInput.value);
       if (adminView.classList.contains("visible") && !adminDashboard.hidden) refreshAdminList(document.getElementById("adminListSearch")?.value || "");
     }
-    function persistMenu() {
+    async function persistMenu() {
       try { localStorage.setItem("shorash-menu-items", JSON.stringify(menuItems)); } catch (error) { console.warn("Local menu cache is unavailable; Firebase remains the source of truth.", error); }
       const customCategories = Object.fromEntries(Object.entries(categoryDetails).filter(([name]) => !defaultCategories.includes(name)));
       try { localStorage.setItem("shorash-menu-categories", JSON.stringify(customCategories)); } catch (error) { console.warn("Local category cache is unavailable.", error); }
-      menuChannel?.postMessage({ type: "menu-update", items: menuItems, customCategories });
-      if (firebaseDatabase) firebaseDatabase.ref("menu").set({ items: menuItems, customCategories }).catch(error => console.warn("Firebase menu sync failed.", error));
+      const payload = { items: menuItems.map(item => ({ ...item })), customCategories };
+      pendingMenuWrite = payload;
+      menuChannel?.postMessage({ type: "menu-update", ...payload });
+      if (!firebaseDatabase) {
+        pendingMenuWrite = null;
+        throw new Error("Firebase is unavailable. Changes were saved only in this browser.");
+      }
+      try {
+        await firebaseDatabase.ref("menu").set(payload);
+      } catch (error) {
+        console.warn("Firebase menu sync failed.", error);
+        throw new Error("Could not save this change online. Check Firebase Database permissions and try again.");
+      } finally {
+        pendingMenuWrite = null;
+      }
     }
     function updateAdminSummary() {
       const itemCount = document.getElementById("adminItemCount");
@@ -737,13 +751,13 @@
         clearButton.type = "button";
         clearButton.innerHTML = '<i class="fa-solid fa-trash" aria-hidden="true"></i> Remove all';
         logoutButton.before(clearButton);
-        clearButton.addEventListener("click", () => {
+          clearButton.addEventListener("click", async () => {
           if (!menuItems.length || !window.confirm("Remove every menu item? This cannot be undone.")) return;
           menuItems.splice(0, menuItems.length);
-          persistMenu();
           syncCategories();
           renderMenu(searchInput.value);
           refreshAdminList();
+          try { await persistMenu(); } catch (error) { adminCategoryError.textContent = error.message; }
         });
       }
       if (listPanel && !listPanel.querySelector(".admin-list-toolbar")) {
@@ -856,13 +870,13 @@
     document.getElementById("adminLogout").addEventListener("click", clearAdminSession);
     window.setInterval(expireAdminSession, 30000);
     document.addEventListener("visibilitychange", expireAdminSession);
-    adminList.addEventListener("click", event => { const deleteButton = event.target.closest("[data-delete-index]"); if (deleteButton) { menuItems.splice(Number(deleteButton.dataset.deleteIndex), 1); persistMenu(); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); return; } const saveButton = event.target.closest("[data-save-price]"); if (!saveButton) return; const index = Number(saveButton.dataset.savePrice); const priceInput = adminList.querySelector(`[data-price-index="${index}"]`); const rawPrice = priceInput.value.replace(/[^0-9]/g, ""); if (!rawPrice) return; menuItems[index].price = `IQD ${Number(rawPrice).toLocaleString("en-US")}`; persistMenu(); renderMenu(searchInput.value); refreshAdminList(); });
+    adminList.addEventListener("click", async event => { const deleteButton = event.target.closest("[data-delete-index]"); if (deleteButton) { menuItems.splice(Number(deleteButton.dataset.deleteIndex), 1); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); try { await persistMenu(); } catch (error) { adminCategoryError.textContent = error.message; } return; } const saveButton = event.target.closest("[data-save-price]"); if (!saveButton) return; const index = Number(saveButton.dataset.savePrice); const priceInput = adminList.querySelector(`[data-price-index="${index}"]`); const rawPrice = priceInput.value.replace(/[^0-9]/g, ""); if (!rawPrice) return; menuItems[index].price = `IQD ${Number(rawPrice).toLocaleString("en-US")}`; renderMenu(searchInput.value); refreshAdminList(); try { await persistMenu(); } catch (error) { adminCategoryError.textContent = error.message; } });
     languageToggle.addEventListener("click", event => { event.stopPropagation(); const isOpen = languagePicker.classList.toggle("open"); languageToggle.setAttribute("aria-expanded", String(isOpen)); });
     document.querySelectorAll(".language-option").forEach(option => option.addEventListener("click", () => setLanguage(option.dataset.language)));
     document.addEventListener("click", event => { if (!event.target.closest("#languagePicker")) { languagePicker.classList.remove("open"); languageToggle.setAttribute("aria-expanded", "false"); } });
-    document.getElementById("categoryForm").addEventListener("submit", event => { event.preventDefault(); const input = document.getElementById("adminCategoryName"); const name = input.value.trim(); const nameAr = document.getElementById("adminCategoryNameAr").value.trim(); const nameKu = document.getElementById("adminCategoryNameKu").value.trim(); if (!name) return; if (categoryDetails[name]) { adminCategoryError.textContent = "That category already exists."; return; } categoryDetails[name] = [adminCategoryIcon.value, "Fresh from the cafe.", nameAr, "", nameKu]; adminCategoryError.textContent = ""; input.value = ""; document.getElementById("adminCategoryNameAr").value = ""; document.getElementById("adminCategoryNameKu").value = ""; syncCategories(); persistMenu(); });
-    adminCategoryList.addEventListener("click", event => { const button = event.target.closest("[data-delete-category]"); if (!button) return; const category = button.dataset.deleteCategory; if (menuItems.some(item => item.category === category)) { adminCategoryError.textContent = "Move or delete its items before removing this category."; return; } delete categoryDetails[category]; adminCategoryError.textContent = ""; syncCategories(); persistMenu(); });
-    document.getElementById("itemForm").addEventListener("submit", async event => { event.preventDefault(); const submitButton = event.target.querySelector("button[type=submit]"); const category = adminItemCategory.value; const imageFile = document.getElementById("adminItemImage").files[0]; const rawPrice = document.getElementById("adminItemPrice").value.replace(/[^0-9]/g, ""); submitButton.disabled = true; submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...'; adminCategoryError.textContent = ""; try { const image = await dataUrlFromFile(imageFile); menuItems.push({ name: document.getElementById("adminItemName").value.trim(), nameAr: document.getElementById("adminItemNameAr").value.trim(), nameKu: document.getElementById("adminItemNameKu").value.trim(), category, price: `IQD ${Number(rawPrice || 0).toLocaleString("en-US")}`, description: document.getElementById("adminItemDescription").value.trim(), descriptionAr: document.getElementById("adminItemDescriptionAr").value.trim(), descriptionKu: document.getElementById("adminItemDescriptionKu").value.trim(), image }); persistMenu(); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); event.target.reset(); } catch (error) { adminCategoryError.textContent = error.message || "Could not add this item."; } finally { submitButton.disabled = false; submitButton.innerHTML = '<i class="fa-solid fa-plus" aria-hidden="true"></i> Add to menu'; } });
+    document.getElementById("categoryForm").addEventListener("submit", async event => { event.preventDefault(); const input = document.getElementById("adminCategoryName"); const name = input.value.trim(); const nameAr = document.getElementById("adminCategoryNameAr").value.trim(); const nameKu = document.getElementById("adminCategoryNameKu").value.trim(); if (!name) return; if (categoryDetails[name]) { adminCategoryError.textContent = "That category already exists."; return; } categoryDetails[name] = [adminCategoryIcon.value, "Fresh from the cafe.", nameAr, "", nameKu]; adminCategoryError.textContent = ""; input.value = ""; document.getElementById("adminCategoryNameAr").value = ""; document.getElementById("adminCategoryNameKu").value = ""; syncCategories(); try { await persistMenu(); } catch (error) { adminCategoryError.textContent = error.message; } });
+    adminCategoryList.addEventListener("click", async event => { const button = event.target.closest("[data-delete-category]"); if (!button) return; const category = button.dataset.deleteCategory; if (menuItems.some(item => item.category === category)) { adminCategoryError.textContent = "Move or delete its items before removing this category."; return; } delete categoryDetails[category]; adminCategoryError.textContent = ""; syncCategories(); try { await persistMenu(); } catch (error) { adminCategoryError.textContent = error.message; } });
+    document.getElementById("itemForm").addEventListener("submit", async event => { event.preventDefault(); const submitButton = event.target.querySelector("button[type=submit]"); const category = adminItemCategory.value; const imageFile = document.getElementById("adminItemImage").files[0]; const rawPrice = document.getElementById("adminItemPrice").value.replace(/[^0-9]/g, ""); submitButton.disabled = true; submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...'; adminCategoryError.textContent = ""; try { const image = await dataUrlFromFile(imageFile); menuItems.push({ name: document.getElementById("adminItemName").value.trim(), nameAr: document.getElementById("adminItemNameAr").value.trim(), nameKu: document.getElementById("adminItemNameKu").value.trim(), category, price: `IQD ${Number(rawPrice || 0).toLocaleString("en-US")}`, description: document.getElementById("adminItemDescription").value.trim(), descriptionAr: document.getElementById("adminItemDescriptionAr").value.trim(), descriptionKu: document.getElementById("adminItemDescriptionKu").value.trim(), image }); await persistMenu(); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); event.target.reset(); } catch (error) { adminCategoryError.textContent = error.message || "Could not add this item."; } finally { submitButton.disabled = false; submitButton.innerHTML = '<i class="fa-solid fa-plus" aria-hidden="true"></i> Add to menu'; } });
     function applyLiveMenu(items, customCategories = {}) {
       menuItems.splice(0, menuItems.length, ...items);
       Object.keys(categoryDetails).filter(name => !defaultCategories.includes(name) && !customCategories[name]).forEach(name => delete categoryDetails[name]);
@@ -876,7 +890,8 @@
     if (firebaseDatabase) {
       firebaseDatabase.ref("menu").on("value", snapshot => {
         const onlineMenu = snapshot.val();
-        if (onlineMenu?.items) applyLiveMenu(onlineMenu.items, onlineMenu.customCategories || {});
+        if (!onlineMenu?.items || pendingMenuWrite) return;
+        applyLiveMenu(onlineMenu.items, onlineMenu.customCategories || {});
       }, error => console.warn("Firebase menu listener failed.", error));
     }
 
