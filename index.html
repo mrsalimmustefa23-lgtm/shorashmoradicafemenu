@@ -705,9 +705,9 @@
       if (adminView.classList.contains("visible") && !adminDashboard.hidden) refreshAdminList(document.getElementById("adminListSearch")?.value || "");
     }
     function persistMenu() {
-      localStorage.setItem("shorash-menu-items", JSON.stringify(menuItems));
+      try { localStorage.setItem("shorash-menu-items", JSON.stringify(menuItems)); } catch (error) { console.warn("Local menu cache is unavailable; Firebase remains the source of truth.", error); }
       const customCategories = Object.fromEntries(Object.entries(categoryDetails).filter(([name]) => !defaultCategories.includes(name)));
-      localStorage.setItem("shorash-menu-categories", JSON.stringify(customCategories));
+      try { localStorage.setItem("shorash-menu-categories", JSON.stringify(customCategories)); } catch (error) { console.warn("Local category cache is unavailable.", error); }
       menuChannel?.postMessage({ type: "menu-update", items: menuItems, customCategories });
       if (firebaseDatabase) firebaseDatabase.ref("menu").set({ items: menuItems, customCategories }).catch(error => console.warn("Firebase menu sync failed.", error));
     }
@@ -806,16 +806,36 @@
     }
     async function dataUrlFromFile(file) {
       if (!file) return "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80";
+      const compressImage = () => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Could not read the selected photo."));
+        reader.onload = () => {
+          const image = new Image();
+          image.onerror = () => reject(new Error("The selected file is not a valid image."));
+          image.onload = () => {
+            const scale = Math.min(1, 1200 / Math.max(image.width, image.height));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(image.width * scale));
+            canvas.height = Math.max(1, Math.round(image.height * scale));
+            canvas.getContext("2d").drawImage(image, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL("image/jpeg", .82));
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
       if (firebaseStorage) {
         try {
           const safeName = `${Date.now()}-${file.name}`.replace(/[^a-zA-Z0-9._-]/g, "-");
-          const snapshot = await firebaseStorage.ref(`menu-images/${safeName}`).put(file);
+          const upload = firebaseStorage.ref(`menu-images/${safeName}`).put(file);
+          const timeout = new Promise((resolve, reject) => window.setTimeout(() => reject(new Error("Storage upload timed out.")), 8000));
+          const snapshot = await Promise.race([upload, timeout]);
           return await snapshot.ref.getDownloadURL();
         } catch (error) {
-          console.warn("Firebase photo upload failed; using local fallback.", error);
+          console.warn("Firebase Storage upload failed; using compressed online database image fallback.", error);
         }
       }
-      return await new Promise(resolve => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.readAsDataURL(file); });
+      return await compressImage();
     }
 
     addAdminLanguageFields();
@@ -842,7 +862,7 @@
     document.addEventListener("click", event => { if (!event.target.closest("#languagePicker")) { languagePicker.classList.remove("open"); languageToggle.setAttribute("aria-expanded", "false"); } });
     document.getElementById("categoryForm").addEventListener("submit", event => { event.preventDefault(); const input = document.getElementById("adminCategoryName"); const name = input.value.trim(); const nameAr = document.getElementById("adminCategoryNameAr").value.trim(); const nameKu = document.getElementById("adminCategoryNameKu").value.trim(); if (!name) return; if (categoryDetails[name]) { adminCategoryError.textContent = "That category already exists."; return; } categoryDetails[name] = [adminCategoryIcon.value, "Fresh from the cafe.", nameAr, "", nameKu]; adminCategoryError.textContent = ""; input.value = ""; document.getElementById("adminCategoryNameAr").value = ""; document.getElementById("adminCategoryNameKu").value = ""; syncCategories(); persistMenu(); });
     adminCategoryList.addEventListener("click", event => { const button = event.target.closest("[data-delete-category]"); if (!button) return; const category = button.dataset.deleteCategory; if (menuItems.some(item => item.category === category)) { adminCategoryError.textContent = "Move or delete its items before removing this category."; return; } delete categoryDetails[category]; adminCategoryError.textContent = ""; syncCategories(); persistMenu(); });
-    document.getElementById("itemForm").addEventListener("submit", async event => { event.preventDefault(); const category = adminItemCategory.value; const image = await dataUrlFromFile(document.getElementById("adminItemImage").files[0]); const rawPrice = document.getElementById("adminItemPrice").value.replace(/[^0-9]/g, ""); menuItems.push({ name: document.getElementById("adminItemName").value.trim(), nameAr: document.getElementById("adminItemNameAr").value.trim(), nameKu: document.getElementById("adminItemNameKu").value.trim(), category, price: `IQD ${Number(rawPrice || 0).toLocaleString("en-US")}`, description: document.getElementById("adminItemDescription").value.trim(), descriptionAr: document.getElementById("adminItemDescriptionAr").value.trim(), descriptionKu: document.getElementById("adminItemDescriptionKu").value.trim(), image }); persistMenu(); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); event.target.reset(); });
+    document.getElementById("itemForm").addEventListener("submit", async event => { event.preventDefault(); const submitButton = event.target.querySelector("button[type=submit]"); const category = adminItemCategory.value; const imageFile = document.getElementById("adminItemImage").files[0]; const rawPrice = document.getElementById("adminItemPrice").value.replace(/[^0-9]/g, ""); submitButton.disabled = true; submitButton.innerHTML = '<i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Saving...'; adminCategoryError.textContent = ""; try { const image = await dataUrlFromFile(imageFile); menuItems.push({ name: document.getElementById("adminItemName").value.trim(), nameAr: document.getElementById("adminItemNameAr").value.trim(), nameKu: document.getElementById("adminItemNameKu").value.trim(), category, price: `IQD ${Number(rawPrice || 0).toLocaleString("en-US")}`, description: document.getElementById("adminItemDescription").value.trim(), descriptionAr: document.getElementById("adminItemDescriptionAr").value.trim(), descriptionKu: document.getElementById("adminItemDescriptionKu").value.trim(), image }); persistMenu(); syncCategories(); renderMenu(searchInput.value); refreshAdminList(); event.target.reset(); } catch (error) { adminCategoryError.textContent = error.message || "Could not add this item."; } finally { submitButton.disabled = false; submitButton.innerHTML = '<i class="fa-solid fa-plus" aria-hidden="true"></i> Add to menu'; } });
     function applyLiveMenu(items, customCategories = {}) {
       menuItems.splice(0, menuItems.length, ...items);
       Object.keys(categoryDetails).filter(name => !defaultCategories.includes(name) && !customCategories[name]).forEach(name => delete categoryDetails[name]);
